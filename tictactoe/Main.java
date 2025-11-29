@@ -11,11 +11,12 @@ public class Main {
         // Instancie  aqui as IAs desejadas (ex.: IAJoao, IAMaria)
         AIPlayer ia1 = new RandomAI("Random-A");
         AIPlayer ia2 = new RandomAI("Random-B");
+     
        
 
 
         // Inicia combate manual
-        BattleController controller = new BattleController(ia1, ia2);
+        BattleController controller = new BattleController(ia2,ia1);
         controller.startBattle();
     }
 }
