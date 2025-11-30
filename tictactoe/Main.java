@@ -12,7 +12,7 @@ public class Main {
         
         AIPlayer ia = new RandomAI("Random-A");
         AIPlayer ia2 = new RandomAI("Random-B");
-        AIPlayer ita = new IaNey("Itaney");
+        AIPlayer ita = new IaNey("IANey");
 
        
 
