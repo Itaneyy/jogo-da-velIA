@@ -12,7 +12,7 @@ public class IaNey implements AIPlayer {
     private final String name;
     private final Strategie strategie;
 
-    private int index = -1;
+    private int index = 0;
     private char mySymbol;
     private char opponent;
 
@@ -25,7 +25,11 @@ public class IaNey implements AIPlayer {
     public Move chooseMove(Board board, char mySymbol) {
 
         this.mySymbol = mySymbol;
-        this.opponent = (mySymbol == 'x') ? 'o' : 'x';
+        this.opponent = (mySymbol == 'X') ? 'O' : 'X';
+
+        if (tabuleiroVazio(board)) {
+            index = 0;
+        }
 
         index++;
 
@@ -37,7 +41,14 @@ public class IaNey implements AIPlayer {
         return this.name;
     }
 
-   
+    private boolean tabuleiroVazio(Board b) {
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (b.getCell(i, j) != ' ')
+                    return false;
+        return true;
+    }
+
     protected List<Move> casasVazias(Board tabuleiro) {
         List<Move> movimentos = new ArrayList<>();
 
@@ -66,7 +77,6 @@ public class IaNey implements AIPlayer {
         return movimentos;
     }
 
-  
     private interface Strategie {
         Move minhaJogada(Board board, int jogadaIndex);
     }
@@ -77,58 +87,87 @@ public class IaNey implements AIPlayer {
         public Move minhaJogada(Board board, int i) {
 
             switch (i) {
-                case 0:
-                    return jogadaInicio(board);
-
                 case 1:
-                    return jogadaGeral(board);
+                    return jogadaInicio(board);
 
                 default:
                     return defense(board);
             }
         }
 
-    
         private Move jogadaInicio(Board board) {
 
-            // tenta centro
-            if (middleIsFree(board) && mySymbol == 'O') {
+            if (mySymbol != 'X' && (middleIsFree(board))) {
                 return new Move(1, 1);
             }
 
-            // tenta canto
             if (cornerIsFree(board)) {
 
                 Move[] cantos = {
                         new Move(0, 0),
                         new Move(0, 2),
-                        new Move(2, 2),
-                        new Move(2, 0)
+                        new Move(2, 0),
+                        new Move(2, 2)
                 };
 
                 List<Move> livres = casasVazias(board);
+                List<Move> jogadaCanto = new ArrayList<Move>();
 
                 for (Move canto : cantos) {
                     for (Move livre : livres) {
                         if (livre.getLinha() == canto.getLinha() &&
                                 livre.getColuna() == canto.getColuna()) {
-                            return canto;
+                            jogadaCanto.add(livre);
                         }
                     }
                 }
+                return jogadaCanto.get(new Random().nextInt(jogadaCanto.size()));
             }
 
             // fallback
-            return casasVazias(board).get(0);
+            return chute(board);
         }
 
-        private Move jogadaGeral(Board board) {
+        private Move defense(Board board) {
+            List<Move> vazias = casasVazias(board);
+
+            for (Move m : vazias) {
+                if (isWinningMove(board, m.getLinha(), m.getColuna(), opponent)) {
+                    return m;
+                }
+            }
+
+            return atk(board);
+
+        }
+
+        private Move atk(Board board) {
+
+            List<Move> vazias = casasVazias(board);
+
+            for (Move m : vazias) {
+                if (isWinningMove(board, m.getLinha(), m.getColuna(), mySymbol)) {
+                    return m;
+                }
+            }
+
+            return ending(board);
+        }
+
+        private Move ending(Board board) {
 
             if (middleIsFree(board)) {
                 return new Move(1, 1);
             }
 
-            return defense(board);
+            return cornerStrategy(board);
+        }
+
+        private Move chute(Board board) {
+            List<Move> casas = casasVazias(board);
+
+            return casas.get(new Random().nextInt(casas.size()));
+
         }
 
         private boolean middleIsFree(Board board) {
@@ -157,45 +196,7 @@ public class IaNey implements AIPlayer {
             return false;
         }
 
-        private Move defense(Board board) {
-
-            List<Move> vazias = casasVazias(board);
-
-         
-            for (Move m : vazias) {
-                if (isWinningMove(board, m.getLinha(), m.getColuna(), opponent)) {
-                    return m;
-                }
-            }
-
-            return atk(board);
-        }
-
-        private Move atk(Board board) {
-
-            List<Move> vazias = casasVazias(board);
-
-            for (Move m : vazias) {
-                if (isWinningMove(board, m.getLinha(), m.getColuna(), mySymbol)) {
-                    return m;
-                }
-            }
-
-            return chute(board);
-        }
-
-        private Move chute(Board board) {
-            List<Move> casas = casasVazias(board);
-
-            return casas.get(new Random().nextInt(casas.size()));
-
-        }
-
         private boolean isWinningMove(Board board, int linha, int coluna, char symb) {
-
-          
-            if (!board.isEmptyAt(linha, coluna))
-                return false;
 
             Board hipot = board.withMove(new Move(linha, coluna), symb);
 
@@ -220,5 +221,18 @@ public class IaNey implements AIPlayer {
             return linhaVence || colunaVence || diagPrincipal || diagSecundaria;
         }
 
+        // usei para deixar mais determinasdo as jogadas em cantos, pois a
+        // jogadaInicial() joga em um canto aleátorio
+        private Move cornerStrategy(Board board) {
+            int[][] corners = { { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } };
+            for (int[] c : corners) {
+                if (board.isEmptyAt(c[0], c[1])) {
+                    return new Move(c[0], c[1]);
+                }
+            }
+            return chute(board);
+        }
+
     }
+
 }
