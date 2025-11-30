@@ -1,26 +1,35 @@
 package tictactoe.ai;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import tictactoe.core.Board;
 import tictactoe.core.Move;
 
 public class IaNey implements AIPlayer {
+
     private final String name;
-    private Strategie strategie;
-    public Board tabuleiroPrevio = null;
-    int index = 0;
+    private final Strategie strategie;
+
+    private int index = -1;
+    private char mySymbol;
+    private char opponent;
 
     public IaNey(String name) {
         this.name = name;
+        this.strategie = new StrategieX();
     }
 
     @Override
     public Move chooseMove(Board board, char mySymbol) {
+
+        this.mySymbol = mySymbol;
+        this.opponent = (mySymbol == 'x') ? 'o' : 'x';
+
         index++;
-        return new Move(1, 2);
+
+        return strategie.minhaJogada(board, index);
     }
 
     @Override
@@ -28,50 +37,17 @@ public class IaNey implements AIPlayer {
         return this.name;
     }
 
-    private void updateProfile(Board board, char mySymbol) {
-        if (tabuleiroPrevio == null) {
-            tabuleiroPrevio = board.copy();
-            return;
-        }
-
-    }
-
-    private void whosFirst() {
-        if (emptyPlaces() == 9) {
-            strategie = new StrategieX();
-            return;
-        }
-        strategie = new StrategieO();
-
-    }
-
-    protected int emptyPlaces() {
-        int size = 0;
-        for (int i = 0; i < Board.SIZE; i++) {
-            for (int j = 0; j < Board.SIZE; j++) {
-                char c = tabuleiroPrevio.getCell(i, j);
-                if (c == ' ') {
-                    size++;
-                }
-            }
-        }
-        return size;
-
-    }
-
+   
     protected List<Move> casasVazias(Board tabuleiro) {
         List<Move> movimentos = new ArrayList<>();
 
         for (int i = 0; i < Board.SIZE; i++) {
             for (int j = 0; j < Board.SIZE; j++) {
-
-                // Se a célula está vazia, adiciona
                 if (tabuleiro.getCell(i, j) == ' ') {
                     movimentos.add(new Move(i, j));
                 }
             }
         }
-
         return movimentos;
     }
 
@@ -80,75 +56,86 @@ public class IaNey implements AIPlayer {
 
         for (int i = 0; i < Board.SIZE; i++) {
             for (int j = 0; j < Board.SIZE; j++) {
-
                 char cell = tabuleiro.getCell(i, j);
 
-                // Se NÃO estiver vazio e NÃO for meu símbolo → é do oponente
                 if (cell != ' ' && cell != mySymbol) {
                     movimentos.add(new Move(i, j));
                 }
             }
         }
-
         return movimentos;
     }
 
+  
     private interface Strategie {
-
+        Move minhaJogada(Board board, int jogadaIndex);
     }
 
     private class StrategieX implements Strategie {
 
-        public Move jogadaInicio() {
+        @Override
+        public Move minhaJogada(Board board, int i) {
 
-            if (conerIsAble()) {
+            switch (i) {
+                case 0:
+                    return jogadaInicio(board);
 
-                Move[] jogadas = {
+                case 1:
+                    return jogadaGeral(board);
+
+                default:
+                    return defense(board);
+            }
+        }
+
+    
+        private Move jogadaInicio(Board board) {
+
+            // tenta centro
+            if (middleIsFree(board) && mySymbol == 'O') {
+                return new Move(1, 1);
+            }
+
+            // tenta canto
+            if (cornerIsFree(board)) {
+
+                Move[] cantos = {
                         new Move(0, 0),
                         new Move(0, 2),
                         new Move(2, 2),
                         new Move(2, 0)
                 };
 
-                List<Move> lista = casasVazias(tabuleiroPrevio);
+                List<Move> livres = casasVazias(board);
 
-                // comparação manual — funciona sem mexer em Move
-                for (Move canto : jogadas) {
-                    for (Move livre : lista) {
+                for (Move canto : cantos) {
+                    for (Move livre : livres) {
                         if (livre.getLinha() == canto.getLinha() &&
                                 livre.getColuna() == canto.getColuna()) {
-
                             return canto;
                         }
                     }
                 }
             }
 
-            // fallback caso nenhum canto esteja disponível
-            return casasVazias(tabuleiroPrevio).get(0);
+            // fallback
+            return casasVazias(board).get(0);
         }
 
-        private Move jogadaMedia() {
-            if (middleIsAble()) {
+        private Move jogadaGeral(Board board) {
+
+            if (middleIsFree(board)) {
                 return new Move(1, 1);
             }
-            return jogadaInicio();
+
+            return defense(board);
         }
 
-        private Boolean middleIsAble() {
-
-            Move desejado = new Move(1, 1);
-
-            for (Move livre : casasVazias(tabuleiroPrevio)) {
-                if (livre.getLinha() == 1 && livre.getColuna() == 1) {
-                    return true;
-                }
-            }
-
-            return false;
+        private boolean middleIsFree(Board board) {
+            return board.getCell(1, 1) == ' ';
         }
 
-        private Boolean conerIsAble() {
+        private boolean cornerIsFree(Board board) {
 
             Move[] cantos = {
                     new Move(0, 0),
@@ -157,114 +144,81 @@ public class IaNey implements AIPlayer {
                     new Move(2, 0)
             };
 
-            List<Move> lista = casasVazias(tabuleiroPrevio);
+            List<Move> livres = casasVazias(board);
 
             for (Move canto : cantos) {
-                for (Move livre : lista) {
+                for (Move livre : livres) {
                     if (livre.getLinha() == canto.getLinha() &&
                             livre.getColuna() == canto.getColuna()) {
-
                         return true;
                     }
                 }
             }
-
             return false;
         }
-    }
 
-    public Move jogadaInicio() {
+        private Move defense(Board board) {
 
-        if (conerIsAblle()) {
+            List<Move> vazias = casasVazias(board);
 
-            Move[] jogadas = {
-                    new Move(0, 0),
-                    new Move(0, 2),
-                    new Move(2, 2),
-                    new Move(2, 0)
-            };
-
-            List<Move> lista = casasVazias(tabuleiroPrevio);
-
-            for (int i = 0; i < lista.size(); i++) {
-                if (lista.get(i) == (jogadas[i])) {
-                    return jogadas[i];
+         
+            for (Move m : vazias) {
+                if (isWinningMove(board, m.getLinha(), m.getColuna(), opponent)) {
+                    return m;
                 }
             }
 
+            return atk(board);
         }
-        return casasVazias(tabuleiroPrevio).get(0);
-    }
 
-    private Move jogadaMedia() {
-        if (middleIsAbble()) {
-            return new Move(1, 1);
-        } else {
-            jogadaInicio();
-        }
-        return new Move(index, index);
+        private Move atk(Board board) {
 
-    }
+            List<Move> vazias = casasVazias(board);
 
-    private Move defense(Board tabuleiro, char mySymbol) {
-        Move[][] perigo = {
-                { new Move(0, 0), new Move(0, 2) },
-                { new Move(1, 0), new Move(0, 2) },
-                { new Move(2, 0), new Move(0, 2) },
-                { new Move(0, 0), new Move(0, 2) },
-                { new Move(0, 0), new Move(2, 2) }
-        };
-
-        List<Move> oponente = mapOponente(tabuleiro, mySymbol);
-        for (Move[] listaMove : perigo) {
-            for (Move elemento : listaMove) {
-                if (oponente.contains(elemento)) {
+            for (Move m : vazias) {
+                if (isWinningMove(board, m.getLinha(), m.getColuna(), mySymbol)) {
+                    return m;
                 }
             }
+
+            return chute(board);
         }
 
-        return new Move(index, index);
-    }
+        private Move chute(Board board) {
+            List<Move> casas = casasVazias(board);
 
-    private Boolean middleIsAbble() {
-        List<Move> lista = casasVazias(tabuleiroPrevio);
-        Move middle = new Move(1, 1);
-        boolean gatilho = false;
+            return casas.get(new Random().nextInt(casas.size()));
 
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.contains(middle)) {
-                gatilho = true;
-                break;
-            }
-        }
-        return gatilho;
-
-    }
-
-    private Boolean conerIsAblle() {
-        Boolean gatilho = false;
-
-        Move[] jogadas = {
-                new Move(0, 0),
-                new Move(0, 2),
-                new Move(2, 2),
-                new Move(2, 0)
-        };
-
-        List<Move> lista = casasVazias(tabuleiroPrevio);
-
-        for (int i = 0; i < jogadas.length; i++) {
-            if (lista.contains(jogadas[i])) {
-                gatilho = true;
-            }
         }
 
-        return gatilho;
+        private boolean isWinningMove(Board board, int linha, int coluna, char symb) {
 
-    }
+          
+            if (!board.isEmptyAt(linha, coluna))
+                return false;
 
-    private class StrategieO implements Strategie {
+            Board hipot = board.withMove(new Move(linha, coluna), symb);
 
+            boolean linhaVence = hipot.getCell(linha, 0) == symb &&
+                    hipot.getCell(linha, 1) == symb &&
+                    hipot.getCell(linha, 2) == symb;
+
+            boolean colunaVence = hipot.getCell(0, coluna) == symb &&
+                    hipot.getCell(1, coluna) == symb &&
+                    hipot.getCell(2, coluna) == symb;
+
+            boolean diagPrincipal = (linha == coluna) &&
+                    hipot.getCell(0, 0) == symb &&
+                    hipot.getCell(1, 1) == symb &&
+                    hipot.getCell(2, 2) == symb;
+
+            boolean diagSecundaria = (linha + coluna == 2) &&
+                    hipot.getCell(0, 2) == symb &&
+                    hipot.getCell(1, 1) == symb &&
+                    hipot.getCell(2, 0) == symb;
+
+            return linhaVence || colunaVence || diagPrincipal || diagSecundaria;
+        }
 
     }
 }
