@@ -1,9 +1,18 @@
+/********************************************************************************************
+ *  AVISO IMPORTANTE — NÃO ALTERAR ESTE ARQUIVO
+ *
+ * EXEMPLO DE IMPLEMENTAÇÃO DE IA
+ *
+ * Exemplo de implementação de IA personalizada.
+ * 
+ * Em caso de CÓPIA, o trabalho será DESCLASSIFICADO, e o aluno receberá nota 0.
+ ***********/
+
 package tictactoe.ai;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import tictactoe.core.Board;
 import tictactoe.core.Move;
 
@@ -111,7 +120,7 @@ public class IaNey implements AIPlayer {
                 };
 
                 List<Move> livres = casasVazias(board);
-                List<Move> jogadaCanto = new ArrayList<Move>();
+                List<Move> jogadaCanto = new ArrayList<>();
 
                 for (Move canto : cantos) {
                     for (Move livre : livres) {
