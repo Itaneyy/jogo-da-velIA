@@ -1,8 +1,14 @@
+/********************************************************************************************
+ *  AVISO IMPORTANTE — NÃO ALTERAR ESTE ARQUIVO
+ *
+ * EXEMPLO DE IMPLEMENTAÇÃO DE IA
+ *
+ * Ela escolhe aleatoriamente uma célula vazia.
+ * 
+ * Em caso de CÓPIA, o trabalho será DESCLASSIFICADO, e o aluno receberá nota 0.
+ ***********/
+
 package tictactoe.ai;
-
-//EXEMPLO DE IMPLEMENTAÇÃO DE IA
-
-//Ela escolhe aleatoriamente uma célula vazia.
 
 import java.util.ArrayList;
 import java.util.List;
