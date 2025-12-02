@@ -3,9 +3,79 @@
 O objetivo do jogo é apoiar o ensino de orientação a objetos. Este repositório contém a estrutura base do jogo e os alunos devem desenvolver seus módulos de "IA" para realizar o combate entre eles.
 
 *Desenvolvido por: Filipe Fernandes e Itaney Filho*
-    
----
 
+-----
+
+# Critérios de Avalição
+
+## Definições 
+
+Nesse trabalho serão distribuidos um total de 4 pontos e será avaliada da seguinte forma :
+
+* Trabalho deve ser indivídual
+
+* A "IA" criada deve ser de autoria exclusiva do aluno. Qualquer tipo de cópia será motivo
+para zerar o trabalho do aluno.
+
+* Somente serão avaliados as  implementações que estiverem funcionando. 
+
+* • A avaliação será feita proporcional ao melhor trabalho. O melhor trabalho terá nota máxima e
+os demais terão nota proporcional ao melhor trabalho.
+
+* O aluno deve ter domínio do código, e fazer uma apresentação clara e objetiva.
+
+
+## Critérios de Avaliação
+### Apresentação -  1 ponto
+
+
+* Domínio do código;
+
+* Domínio dos pilares de DOO (teoria);
+
+* Qualidade da apresentação;
+
+*  Não ter semelhança com códigos apresentados anteriormente;
+
+### Implementação de IA - 3 pontos
+
+* Criatividade na implementação ;
+
+* Melhor estrátegia para a vitória;
+
+* Organização do código  ;
+
+* Domínio dos pilares de DOO (prática) & programação ;
+
+#### A pontuação nesse críterio será dividida  da seguinte forma : 
+
+
+* Aluno(a) com a melhor implementação - **3 pontos**
+
+* Aluno(a) com a  segunda melhor implementação - **2 pontos**
+
+* Aluno(a) com a  terceira melhor implementação - **1 ponto**
+
+* Aos demais receberão  uma pontuação  entre **1** e **0**, aos que entrarem nesse quesito será avaliada  a média de presença nas aulas, participação, realização dos exercícios de sala de aula.
+
+
+
+
+## Regras para apresentação:
+
+*  Cada aluno terá em torno de 15 minutos para fazer a apresentação.
+
+#### Na apresentação, o aluno deverá:
+
+* Mostrar e explicar seu código, explicar qual foi sua ideia/estratégia para a  implementação.
+
+* Mostrar sua implementação de IA rodando.
+
+* Haverá espaço para perguntas gerais.
+
+* O aluno deve apresentar domínio do código ao responder as perguntas e apresentar o código.
+
+-----
 
 ##  Documentação Geral do Projeto
 
@@ -168,7 +238,7 @@ Usado para:
 
 ---
 
-# O que aluno  o aluno precisa saber para criar sua própria IA
+# O que   o aluno precisa saber para criar sua própria IA
 
 ## 1. Entender como ler o tabuleiro
 ```java
@@ -209,4 +279,6 @@ A IA não altera o tabuleiro real.
 Ela recebe uma visão apenas para análise.
 
 ---
+
+
 
